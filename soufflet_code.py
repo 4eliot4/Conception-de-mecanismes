@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict
 
 # ------------------------------------------------------------------
-# Tableau C2 (torsion rectangulaire)  :   ratio a/b  ->  C2
+# Tableau C2 (torsion section rectangulaire :   ratio a/b  ->  C2
 C2_TABLE = {
     1.0: 0.1406,
     1.2: 0.1661,
@@ -104,3 +104,13 @@ class Soufflet:
         """Retourne toutes les données + raideurs (dict)."""
         return {**asdict(self), **self.stiffness()}
 
+# ------------------------------------------------------------------
+# Exemple d’utilisation
+if __name__ == "__main__":
+    # lame acier : 0.8 mm épaisseur, 8 mm large, 20 mm longue, écart 30 mm
+    s = Soufflet(E=210e9, nu=0.3, L=0.02, b=0.008, t=0.0008, h=0.03)
+    ratio = max(s.b, s.t) / min(s.b, s.t)
+    print(f"ratio a/b = {ratio:.2f}  →  C2 = {s.C2:.4f}")
+    for k, v in s.stiffness().items():
+        u = "N/m" if "k_" in k and "theta" not in k else "N·m/rad"
+        print(f"{k:>11s} : {v:9.3e}  {u}")
