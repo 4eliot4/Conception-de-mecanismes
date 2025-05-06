@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict
 
 # ------------------------------------------------------------------
-# Tableau C2 (torsion section rectangulaire :   ratio a/b  ->  C2
 C2_TABLE = {
     1.0: 0.1406,
     1.2: 0.1661,
@@ -12,9 +11,6 @@ C2_TABLE = {
 }
 
 def c2_from_ratio(r):
-    """Renvoie le coefficient C2 (torsion) pour un ratio a/b donné.
-       - Interpolation linéaire entre les points connus.
-       - Si a/b ≥ 3  →  C2 = 1/3 (plaque mince)."""
     if r >= 3.0:
         return 1.0 / 3.0
     keys = sorted(C2_TABLE)
@@ -28,15 +24,6 @@ def c2_from_ratio(r):
 # ------------------------------------------------------------------
 @dataclass
 class Soufflet:
-    """Modèle 2‑lames pour guidage flexible type 'soufflet'.
-
-    E  : module de Young (Pa)
-    nu : Poisson
-    L  : longueur libre d'une lame (m)
-    b  : largeur de la lame (dans z) (m)
-    t  : épaisseur de la lame (dans y) (m)
-    h  : distance verticale entre les deux lames (m)
-    """
     E : float
     nu: float
     L : float
@@ -44,25 +31,22 @@ class Soufflet:
     t : float
     h : float
 
-    # ---------------- modules --------------------------------------
     @property
     def G(self):
         return self.E / (2 * (1 + self.nu))
 
-    # ---------------- inerties de section --------------------------
     @property
-    def Iy(self):                    # flexion dans x‑y  (flèche z)
-        return self.t * self.b**3 / 12   # b^3 car flèche = z
+    def Iy(self):
+        return self.t * self.b**3 / 12
 
     @property
-    def Iz(self):                    # flexion dans x‑z  (flèche y)
-        return self.b * self.t**3 / 12   # t^3 car flèche = y
+    def Iz(self):
+        return self.b * self.t**3 / 12
 
     @property
     def A(self):
         return self.b * self.t
 
-    # ---------------- torsion (C2) ---------------------------------
     @property
     def C2(self):
         ratio = max(self.b, self.t) / min(self.b, self.t)
@@ -72,33 +56,25 @@ class Soufflet:
     def k_torsion_lamella(self):
         a = max(self.b, self.t)
         b_small = min(self.b, self.t)
-        return self.C2 * a * b_small**3 * self.G / self.L   # N·m/rad
+        return self.C2 * a * b_small**3 * self.G / self.L
 
-    # ---------------- raideur d'une lame ---------------------------
-    def _k_lamella(self):
-        k_ax  = self.E * self.A      / self.L          # traction (x)
-        k_y   = 3 * self.E * self.Iz / self.L**3       # flèche y (flex hors‑plan)
-        k_z   = 3 * self.E * self.Iy / self.L**3       # flèche z (flex in‑plane)
-        k_tx  = self.k_torsion_lamella                 # torsion autour x
-        k_ty  = k_z * self.h**2                        # rotation autour y
-        k_tz  = k_y * self.h**2                        # rotation autour z
-        return dict(k_ax=k_ax, k_y=k_y, k_z=k_z,
-                    k_theta_x=k_tx, k_theta_y=k_ty, k_theta_z=k_tz)
-
-    # ---------------- assemblage 2 lames ---------------------------
     def stiffness(self):
-        """Raideur du soufflet complet (dict, unités SI)."""
-        k = self._k_lamella()
-        return {
-            # translations
-            "k_axial_x" : k["k_ax"] / 2,   # lames en série (traction)
-            "k_y"       : 2 * k["k_y"],    # lames en parallèle (flèche y)
-            "k_z"       : k["k_z"] / 2,    # lames en série (flèche z)
-            # rotations
-            "k_theta_x" : 2 * k["k_theta_x"],
-            "k_theta_y" : 2 * k["k_theta_y"],
-            "k_theta_z" : 2 * k["k_theta_z"],
-        }
+        """Raideur complète du soufflet (dict, unités SI)."""
+        k_ax  = self.E * self.Iz      / (2*self.L)          
+        k_y   = 12 * self.E * self.Iz / self.L**3       
+        k_z   = self.b * self.t**3 * self.G / (6 * self.L**3)       
+        k_tx  = self.b * self.t**3 * self.G / (6 * self.L**3)     
+        k_ty  = self.E * self.Iy / (2 * self.L)                    
+        k_tz  = self.E * self.Iz / (2*self.L)    
+
+        return dict(
+            k_axial_x = k_ax,
+            k_y = k_y,
+            k_z = k_z,
+            k_theta_x = k_tx,
+            k_theta_y = k_ty,
+            k_theta_z = k_tz
+        )
 
     def summary(self):
         """Retourne toutes les données + raideurs (dict)."""
@@ -107,7 +83,6 @@ class Soufflet:
 # ------------------------------------------------------------------
 # Exemple d’utilisation
 if __name__ == "__main__":
-    # lame acier : 0.8 mm épaisseur, 8 mm large, 20 mm longue, écart 30 mm
     s = Soufflet(E=210e9, nu=0.3, L=0.02, b=0.008, t=0.0008, h=0.03)
     ratio = max(s.b, s.t) / min(s.b, s.t)
     print(f"ratio a/b = {ratio:.2f}  →  C2 = {s.C2:.4f}")
@@ -115,10 +90,9 @@ if __name__ == "__main__":
         u = "N/m" if "k_" in k and "theta" not in k else "N·m/rad"
         print(f"{k:>11s} : {v:9.3e}  {u}")
 
-
-s = Soufflet(E=210e9, nu=0.3, L=0.3, b=0.030, t=0.001, h=0.03)
-print("SSS")
-raideurs = s.stiffness()
-for nom, valeur in raideurs.items():
-    unite = "N/m" if "k_" in nom and "theta" not in nom else "N·m/rad"
-    print(f"{nom} : {valeur:.3e} {unite}")
+    s = Soufflet(E=210e9, nu=0.3, L=0.3, b=0.030, t=0.001, h=0.03)
+    print("SSS")
+    raideurs = s.stiffness()
+    for nom, valeur in raideurs.items():
+        unite = "N/m" if "k_" in nom and "theta" not in nom else "N·m/rad"
+        print(f"{nom} : {valeur:.3e} {unite}")
