@@ -60,9 +60,9 @@ class Soufflet:
 
     def stiffness(self):
         """Raideur complète du soufflet (dict, unités SI)."""
-        k_ax  = self.E * self.Iz      / (2*self.L)          
+        k_ax  = 2*self.L**2 + self.E * self.Iz      / (self.L)          
         k_y   = 12 * self.E * self.Iz / self.L**3       
-        k_z   = self.b * self.t**3 * self.G / (6 * self.L**3)       
+        k_z   = 2*self.L**2 * self.b * self.t**3 * self.G / (3 * self.L**3)       
         k_tx  = self.b * self.t**3 * self.G / (6 * self.L**3)     
         k_ty  = self.E * self.Iy / (2 * self.L)                    
         k_tz  = self.E * self.Iz / (2*self.L)    
