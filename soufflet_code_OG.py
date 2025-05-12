@@ -1,26 +1,3 @@
-
-"""
-# ------------------------------------------------------------------
-# Exemple d’utilisation
-if __name__ == "__main__":
-    s = Soufflet(E=210e9, nu=0.3, L=0.02, b=0.008, t=0.0008, h=0.03)
-    ratio = max(s.b, s.t) / min(s.b, s.t)
-    print(f"ratio a/b = {ratio:.2f}  →  C2 = {s.C2:.4f}")
-    for k, v in s.stiffness().items():
-        u = "N/m" if "k_" in k and "theta" not in k else "N·m/rad"
-        print(f"{k:>11s} : {v:9.3e}  {u}")
-
-    s = Soufflet(E=210e9, nu=0.3, L=0.3, b=0.030, t=0.001, h=0.03)
-    print("SSS")
-    raideurs = s.stiffness()
-    for nom, valeur in raideurs.items():
-        unite = "N/m" if "k_" in nom and "theta" not in nom else "N·m/rad"
-        print(f"{nom} : {valeur:.3e} {unite}")
-"""
-
-
-
-
 from dataclasses import dataclass, asdict
 
 # ------------------------------------------------------------------
