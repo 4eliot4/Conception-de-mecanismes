@@ -50,20 +50,4 @@ Les pièces sont principalement usinées :
 ## 🧮 Fichiers du dépôt
 
 Ce dépôt contient :
-
-- `/src/` : scripts Python pour les calculs de :
-  - Rigidités mécaniques (translation, rotation)
-  - Contraintes maximales dans les flexibles
-  - Masse équivalente, résolution de mesure, erreur inertielle
-- `/doc/` : le rapport complet en LaTeX (`main.tex`) incluant :
-  - Analyse cinématique
-  - Calculs analytiques
-  - Schémas cinématiques et figures
-- `/Images/` : toutes les figures utilisées dans le rapport
-
-## 📝 Comment utiliser les scripts Python ?
-
-1. Cloner le dépôt :
-   ```bash
-   git clone https://github.com/nom-utilisateur/FlyForce.git
-   cd FlyForce
+- tous les fichiers o
