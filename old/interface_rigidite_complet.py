@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import pandas as pd
 import os
-from soufflet_code import Soufflet
-from pivot import Pivot
-from membrane import Membrane
+from old.soufflet_code import Soufflet
+from old.pivot import Pivot
+from old.membrane import Membrane
 
 root = tk.Tk()
 root.title("Rigidité totale du système - Export complet")
