@@ -2,7 +2,7 @@ class Membrane(object):
     def __init__(self, F, R_int, bt, Lt, h =200 * 10 ** (-6)):
         '''
         F ~ N/mm
-        mu defaut = 200µm peut descendre jusqu'à 60µm maif le mieux c'est 200
+        mu defaut = 200µm peut descendre jusqu'à 60µm mais le mieux c'est 200
         D = diamètre mesuré a l'extrémité la plus proche de l'axe des lames
         D_int = 5.5mm
         dimensions choisies : h = 0.1mm | b = 1.0mm | L = 24.3mm | k = 0.5017803795090455 N/mm| err = 3.5481249999997912e-06
