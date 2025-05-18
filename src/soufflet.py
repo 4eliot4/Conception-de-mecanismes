@@ -44,10 +44,6 @@ class Soufflet:
         return self.b * self.t**3 / 12
 
     @property
-    def A(self):
-        return self.b * self.t
-
-    @property
     def C2(self):
         ratio = max(self.b, self.t) / min(self.b, self.t)
         return c2_from_ratio(ratio)
@@ -60,7 +56,7 @@ class Soufflet:
 
     def stiffness(self):
         """Raideur complète du soufflet (dict, unités SI)."""
-        k_ax  = 2 * self.E * self.Iz      / (self.L * self.h**2)
+        k_ax  = 2 * self.E * self.Iz / (self.L * self.h**2)
         k_y   = 6 * self.E * self.Iz / self.L**3
         k_z   = 2* self.b * self.t**3 * self.G / (3 * self.L * self.h**2)
         k_tx  = self.b * self.t**3 * self.G / (6 * self.L)
@@ -79,39 +75,3 @@ class Soufflet:
     def summary(self):
         """Retourne toutes les données + raideurs (dict)."""
         return {**asdict(self), **self.stiffness()}
-
-"""
-# ------------------------------------------------------------------
-# Exemple d’utilisation
-if __name__ == "__main__":
-    s = Soufflet(E=210e9, nu=0.3, L=0.02, b=0.008, t=0.0008, h=0.03)
-    ratio = max(s.b, s.t) / min(s.b, s.t)
-    print(f"ratio a/b = {ratio:.2f}  →  C2 = {s.C2:.4f}")
-    for k, v in s.stiffness().items():
-        u = "N/m" if "k_" in k and "theta" not in k else "N·m/rad"
-        print(f"{k:>11s} : {v:9.3e}  {u}")
-
-    s = Soufflet(E=210e9, nu=0.3, L=0.3, b=0.030, t=0.001, h=0.03)
-    print("SSS")
-    raideurs = s.stiffness()
-    for nom, valeur in raideurs.items():
-        unite = "N/m" if "k_" in nom and "theta" not in nom else "N·m/rad"
-        print(f"{nom} : {valeur:.3e} {unite}")
-"""
-
-'''
-# ========= essai : on vise ≃ 3 N/mm dans tous les axes =========
-E  = 210e9     # Pa  (inox)
-nu = 0.30
-L  = 0.030     # 30 mm
-b  = 0.02   # 12.5 mm
-t  = 0.00025   # 0.20 mm
-h  = 0.050     # 50 mm
-
-s = Soufflet(E, nu, L, b, t, h)
-
-print("----- rigidités globales (N/m ou N·m/rad) -----")
-for nom, val in s.stiffness().items():
-    unit = "N·m/rad" if "theta" in nom else "N/m"
-    print(f"{nom:>11s} : {val:10.3e} {unit}")
-'''

@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 from membrane import Membrane
 from pivot import Pivot
 from soufflet import Soufflet
@@ -36,18 +35,18 @@ class RigiditeApp:
         self.results = {}
 
     def create_membrane_tab(self, frame):
-        labels = ["F (N/mm)", "R_int (m)", "bt (m)", "Lt (m)", "h (m)","D_m (m)"]
-        defaults = [0.5, 7.5e-3, 300e-6, 15e-3, 100e-6, 18e-3]
+        labels = ["R_int (m)", "t (m)","D_m (m)"]
+        defaults = [6e-3, 100e-6, 18.9e-3]
         self.create_inputs(frame, "Membrane", labels, defaults)
 
     def create_pivot_tab(self, frame):
-        labels = ["L (m)", "b (m)", "h (m)"]
-        defaults = [10.0e-3, 2.0e-3, 100e-6]
+        labels = ["L (m)", "b (m)", "t (m)"]
+        defaults = [10.0e-3, 4.0e-3, 100e-6]
         self.create_inputs(frame, "Pivot", labels, defaults)
 
     def create_soufflet_tab(self, frame):
         labels = ["E (Pa)", "nu", "L (m)", "b (m)", "t (m)", "h (m)"]
-        defaults = [114e9, 0.34, 0.011, 0.012, 0.0002, 0.05]
+        defaults = [114e9, 0.34, 0.0117, 0.0125, 0.0002, 0.035]
         self.create_inputs(frame, "Soufflet", labels, defaults)
 
     def create_inputs(self, frame, section, labels, defaults):
@@ -64,19 +63,16 @@ class RigiditeApp:
 
         try:
             # Membrane
-            F = float(self.inputs["Membrane"][0].get())
-            R_int = float(self.inputs["Membrane"][1].get())
-            bt = float(self.inputs["Membrane"][2].get())
-            Lt = float(self.inputs["Membrane"][3].get())
-            h_m = float(self.inputs["Membrane"][4].get())
-            D_m = float(self.inputs["Membrane"][5].get())
-            membrane = Membrane(F, R_int, bt, Lt, h_m)
+            R_int = float(self.inputs["Membrane"][0].get())
+            t_m = float(self.inputs["Membrane"][1].get())
+            D_m = float(self.inputs["Membrane"][2].get())
+            membrane = Membrane(R_int, t_m)
 
             # Pivot
             L_p = float(self.inputs["Pivot"][0].get())
             b_p = float(self.inputs["Pivot"][1].get())
-            h_p = float(self.inputs["Pivot"][2].get())
-            pivot = Pivot(L_p, b_p, h_p)
+            t_p = float(self.inputs["Pivot"][2].get())
+            pivot = Pivot(L_p, b_p, t_p)
 
             # Soufflet
             E = float(self.inputs["Soufflet"][0].get())
@@ -87,20 +83,19 @@ class RigiditeApp:
             h_s = float(self.inputs["Soufflet"][5].get())
             soufflet = Soufflet(E, nu, L_s, b_s, t_s, h_s)
 
-            # pov le calcul est la
-            rigidite = 4 * membrane.rx/(D_m**2) + 2 * pivot.kx_p + 2 * pivot.rz_p/(D_m**2) + soufflet.stiffness()["k_axial_x"]\
-                      + soufflet.stiffness()["k_y"] + soufflet.stiffness()["k_z"] + 2*pivot.k_simple/(D_m**2)
+            #calcul rigidité totale
+            rigidite = 4 * membrane.rx/(D_m**2) + 2 * pivot.kx_p + 2 * pivot.rz_p/(D_m**2) + soufflet.stiffness()["k_axial_x"] \
+                       + soufflet.stiffness()["k_y"] + soufflet.stiffness()["k_z"] + 2 * pivot.k_simple/(D_m**2)
+
+            torsion = soufflet.stiffness()["k_theta_y"] + 2 * pivot.rx_p
+            print(membrane.rx/(D_m**2))
 
             self.results = {
                 "kx": rigidite,
                 "ky": rigidite,
-                "kz": rigidite
+                "kz": rigidite,
+                "r" : torsion
             }
-            print(4 * membrane.rx/(D_m**2))
-            print(2 * pivot.rz_p/(D_m**2))
-            print(2 * pivot.kx_p)
-            print(2* pivot.k_simple/(D_m**2))
-            print(soufflet.stiffness()["k_axial_x"] + soufflet.stiffness()["k_y"] + soufflet.stiffness()["k_z"])
 
             self.display_results(membrane, pivot, soufflet)
 
@@ -109,7 +104,7 @@ class RigiditeApp:
 
     def display_results(self, membrane, pivot, soufflet):
         self.result_box.insert(tk.END, "=== Rigidités individuelles ===\n")
-        self.result_box.insert(tk.END, f"Membrane: kz = {membrane.kz_m:.2f} N/m | kx, ky = {membrane.kx_m:.2f} N/m | Torsion = {membrane.k_torsion:.2f} N·m/rad\n")
+        self.result_box.insert(tk.END, f"Membrane: kz = {membrane.kz_m:.2f} N/m | kx, ky = {membrane.kx_m:.2f} N/m | Rotation = {membrane.rx:.2f} N·m/rad\n")
         self.result_box.insert(tk.END, f"Pivot:    kz = {pivot.kz_p:.2f} N/m | kx = {pivot.kx_p:.2f} | ky = {pivot.ky_p:.2f} | Torsion = {pivot.rz_p:.2f} N·m/rad\n")
         self.result_box.insert(tk.END, "Soufflet:\n")
         for k, v in soufflet.stiffness().items():
