@@ -47,7 +47,7 @@ Les pièces sont principalement usinées :
 - Par **fraisage** (pour les blocs rigides) ;
 - Assemblées mécaniquement (vis, interfaces sandwich pour les membranes).
 
-## Fichiers du dépôt
+## Fichiers du dépôt - SRC
 
 Ce dépôt contient l'implémentation des calcules sous forme de code python.
 Tout se trouve dans le dossier source **src**
