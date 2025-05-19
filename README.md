@@ -2,7 +2,7 @@
 
 Projet réalisé dans le cadre du cours **Conception de mécanismes** à l’**EPFL** (Mai 2025) – **Groupe 28**
 
-## 🎯 Objectif du projet
+##  Objectif du projet
 
 FlyForce est un **capteur de force tri-axial** basé sur un **mécanisme à guidages flexibles**. Il permet la mesure précise de forces de contact dans les trois directions de l’espace (\(x, y, z\)) à l’aide de **capteurs capacitifs**. Ce capteur est conçu pour équiper un stylet sphérique utilisé dans des machines de mesure tridimensionnelle (CMM), afin de contrôler la qualité géométrique des pièces mécaniques.
 
@@ -13,7 +13,7 @@ Le système doit respecter des contraintes strictes :
 - Fonctionnement uniquement en translation (3 DOF)
 - Durabilité (> 57 millions de cycles)
 
-## 🧠 Principe de fonctionnement
+##  Principe de fonctionnement
 
 Le cœur du système repose sur :
 - **Un bloc central mobile** qui porte le stylet.
@@ -35,7 +35,7 @@ Le mécanisme est :
 
 Les **capteurs capacitifs** sont montés entre le bâti et les faces du bloc central. Le déplacement de celui-ci est mesuré directement, sans pièces intermédiaires, garantissant une **mesure directe et précise** de la force appliquée.
 
-## ⚙️ Architecture mécanique
+##  Architecture mécanique
 
 Le système est conçu en **guidages flexibles**, avec :
 - **Rotules à doigt guidée** (1 lame flexion/torsion) ;
@@ -47,7 +47,27 @@ Les pièces sont principalement usinées :
 - Par **fraisage** (pour les blocs rigides) ;
 - Assemblées mécaniquement (vis, interfaces sandwich pour les membranes).
 
-## 🧮 Fichiers du dépôt
+## Fichiers du dépôt
 
-Ce dépôt contient :
-- tous les fichiers o
+Ce dépôt contient l'implémentation des calcules sous forme de code python.
+Tout se trouve dans le dossier source **src**
+
+### 1. Cloner le dépôt Git
+git clone https://github.com/nom-utilisateur/nom-du-repo.git
+cd nom-du-repo
+
+### 2. Créer un environnement virtuel (venv)
+python -m venv venv
+
+### 3. Activer l'environnement virtuel
+
+**Sur Windows :**
+```bash
+venv\Scripts\activate
+```
+
+**Sur macOS / Linux :**
+```terminal
+source venv/bin/activate
+```
+
